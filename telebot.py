@@ -1,4 +1,4 @@
-#!/usr/bin/python
+﻿#!/usr/bin/python
 # -*- coding: utf-8 -*-
 import csv, requests, json, telepot, sys, os, time, datetime, psutil, RPi.GPIO as GPIO
 from telepot.loop import MessageLoop
@@ -14,23 +14,31 @@ from config import dmrid
 
 logfile = "botlog.txt"
 userfile = "users.csv"
-grantfehler = "Du darfst das nicht!"
-mmdvmaufruf = "/usr/bin/screen /home/pi/MMDVMHost/MMDVMHost /home/pi/MMDVMHost/MMDVM-DB0ASE.ini"
-dmrgwaufruf = "/usr/bin/screen /home/pi/DMRGateway/DMRGateway /home/pi/DMRGateway/DMRGateway-DB0ASE.ini"
+unauthorized = "Ukaza ne mores izvrsiti! Nimas SysOp pravic!"
+#grantfehler = "Du darfst das nicht!"
+#mmdvmaufruf = "sudo systemctl start mmdvmhost.service"
+mmdvmstart = "sudo systemctl start mmdvmhost.service"
+mmdvmrestart = "sudo systemctl restart mmdvmhost.service"
+ircddbgwstart = "sudo systemctl start ircddbgateway.service"
+ircddbgwrestart = "sudo systemctl restart ircddbgateway.service"
+ysfgwstart = "sudo /etc/init.d/YSFGateway.sh start"
+ysfgwrestart = "sudo /etc/init.d/YSFGateway.sh restart"
+#dmrgwaufruf = "/usr/bin/screen /home/pi/DMRGateway/DMRGateway /home/pi/DMRGateway/DMRGateway-DB0ASE.ini"
 
 # GPIO Settings
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(13, GPIO.OUT)
 GPIO.setup(15, GPIO.OUT)
+GPIO.setup(4, GPIO.OUT)
 
-# Loggingfunktion
+# Log
 def botlog(logtext):
     file = open(logfile, "a+")
     file.write(time.strftime("%d.%m. %H:%M:%S") + ": " + logtext + '\n')
     file.close()
 
-# Funktion zur Information des/der Botowner
+# Function Information about Botowner
 def ownerinfo(msg,owner):
     for x in owner:
 	try:
@@ -41,11 +49,11 @@ def ownerinfo(msg,owner):
 # Lasthearedfunktion
 def lastheared(suchstring):
     if suchstring == '':
-	suchstring = "received RF voice header"
+	suchstring =  "received network voice header from"
     else:
         suchstring = "received RF voice header from " +suchstring
     heared = []
-    dateiname = "/var/log/mmdvm/mmdvm-"+(time.strftime("%Y-%m-%d"))+".log"
+    dateiname = "/var/log/MMDVM/MMDVM-"+(time.strftime("%Y-%m-%d"))+".log"
     file = open(dateiname, "r")
     for line in file:
         if line.find(suchstring) > 1:
@@ -54,7 +62,7 @@ def lastheared(suchstring):
 	    heared.append(string)
     file.close()
     if not heared:
-	return "Heute nicht aufgetaucht..."
+	return "Danes še ni bilo prometa..."
     else:
         return heared[-1][2] + " " + heared[-1][4] + " " + heared[-1][5] + " " + heared[-1][11] + " " + heared[-1][13] + " " + heared[-1][14]
 
@@ -73,7 +81,7 @@ def talkgroups():
         for tg in data['clusters']:
             tgs += "\n" + str(tg['talkgroup']) + " im TS" + str(tg['slot']) + " (" + str(tg['extTalkgroup']) + ")"
         if tgs == 'Talkgroups:':
-            tgs = "Keine Talkgroups statisch geschaltet."
+            tgs = "Ni nastavljenih staticnih TG"
     except:
         print("Abruf der Talkgroups ging schief....")
     r.close()
@@ -83,9 +91,9 @@ def talkgroups():
 def prozesschecker(prozess):
     proc = ([p.info for p in psutil.process_iter(attrs=['pid','name']) if prozess in p.info['name']])
     if proc != []:
-	status = "Läuft"
+	status = "zagnan"
     else:
-	status = "Läuft nicht"
+	status = "ni zagnan"
     return status
 
 def handle(msg):
@@ -93,24 +101,26 @@ def handle(msg):
     #print(content_type, chat_type, chat_id)
     #pprint(msg)
 
-    vorname = msg['from']['first_name']
+    #vorname = msg['from']['first_name']
+	name = msg['from']['first_name']
     username = msg['from']['username']
     id = msg['from']['id']
     msg['text'] = msg['text'].lower()
 
     # print(msg['text'])
 
-    if msg['text'] in ["/start","/start start", "start", "hallo", "Hallo", "Hi", "Start"]:
-	bot.sendMessage(chat_id, "Herzlich willkommen bei " + botcall + " " + vorname + "!" + \
-				 "\nUm Hilfe zu erhalten, schreib /hilfe. Informationen und Hinweise bitte an @dl2ajb.")
-
-    elif msg['text'] in ["/hilfe", "hilfe"]:
-	hilfetext = "Informationen und Kommandos:\n/status Gibt den Status des Repeaters aus\n/hilfe Hilfetext mit der" \
-                    " Liste der Kommandos\n/tg Listet die in DMR geschalteten TG auf\n/lheared Gibt aus, wer als letztes lokal gehört wurde."
+    if msg['text'] in ["/start","/start start", "start", "hallo", "Hallo", "Hi", "Start", "Zdravo", "Zivijo", "zdravo", "zivijo"]:
+	bot.sendMessage(chat_id, "Dobrodosel v " + botcall + " " + name + "!" + \
+				 "\nCe potrebujes pomoc vpisi /pomoc . Za dodatne informacije, predloge in pripombe sem dosegljiv na Telegramu: @s58db ali na email: s58db.danilo@gmail.com.")
+				 
+    elif msg['text'] in ["/pomoc", "pomoc","help","hilfe"]:
+	hilfetext = "Informacije in ukazi:\n/status Informacija o stanju repetitorja \n/hilfe Prikaze " \
+                    " listo ukazov\n/tg Izpiše seznam staticnih TG na repetitorju \n/lheared Izpiše zadnjo postajo ki je oddajala"
         if id in grant:
-            hilfetext += "\n\n/killmmdvm Stoppt MMDVM\n/startmmdvm Startet MMDVM\n/killdmrgw Stoppt das DMRGateway\n/startdmrgw Startet DMRGateway" \
-			 "\n/txan Schaltet den Sender an\n/txaus Schaltet den Sender aus\n/rxan Schaltet den RX ein" \
-			 "\n/rxaus Schaltet den RX an\n/reboot start den Rechner neu"
+            hilfetext += "\n\n/killmmdvm zaustavi MMDVMHost\n/startmmdvm zazeni MMDVMHost\n/killircddbgw zaustavitev ircDDBGateway\n/startircddbgw zagon ircDDBGateway" \
+			"\n/killysfgw zaustavi YSFGateway\n/startysfgw zazeni YSFGateway" \
+			# "\n/txan Schaltet den Sender an\n/txaus Schaltet den Sender aus\n/rxan Schaltet den RX ein" \
+			# "\n/rxaus Schaltet den RX an\n/reboot start den Rechner neu"
         bot.sendMessage(chat_id,botcall + " " + hilfetext)
 
     elif msg['text'] in ["/tg"]:
@@ -134,7 +144,7 @@ def handle(msg):
 
     elif msg['text'] in ["/startmmdvm"]:
         if id in grant:
-	    os.system(mmdvmaufruf)
+	    os.system(mmdvmstart)
 	    bot.sendMessage(chat_id,"Starte MMDVM")
 	else:
 	    bot.sendMessage(chat_id,grantfehler)
@@ -210,7 +220,7 @@ def handle(msg):
 	else:
             bot.sendMessage(chat_id,grantfehler)
     else:
-	bot.sendMessage(chat_id, 'Mit "' + msg['text'] + '" kann ich nichts anfangen, '+ vorname + "!\nEine Liste der Befehle bekommst du mit /hilfe.")
+	bot.sendMessage(chat_id, 'Mit "' + msg['text'] + '" kann ich nichts anfangen, '+ name + "!\nEine Liste der Befehle bekommst du mit /hilfe.")
 
 bot = telepot.Bot(apikey)
 
