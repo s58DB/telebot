@@ -138,42 +138,56 @@ def handle(msg):
     elif msg['text'] in ["/killmmdvm"]:
 	if id in grant:
 	    prockiller("MMDVMHost")
-	    bot.sendMessage(chat_id,"Beende MMDVM...")
+	    bot.sendMessage(chat_id,"MMDVMHost ustavljen...")
         else:
 	    bot.sendMessage(chat_id,grantfehler)
 
     elif msg['text'] in ["/startmmdvm"]:
         if id in grant:
 	    os.system(mmdvmstart)
-	    bot.sendMessage(chat_id,"Starte MMDVM")
+	    bot.sendMessage(chat_id,"MMDVMHost ustavljen... ")
+	else:
+	    bot.sendMessage(chat_id,grantfehler)
+		
+		elif msg['text'] in ["/killircddbgw"]:
+	if id in grant:
+	    prockiller("ircddbgateway")
+	    bot.sendMessage(chat_id,"ircDDBGateway ustavljen...")
+        else:
+	    bot.sendMessage(chat_id,grantfehler)
+
+    elif msg['text'] in ["/startircddbgw"]:
+        if id in grant:
+	    os.system(ircddbgwstart)
+	    bot.sendMessage(chat_id,"ircDDBGateway zagnan...")
 	else:
 	    bot.sendMessage(chat_id,grantfehler)
 
-    elif msg['text'] in ["/killdmrgw"]:
-        if id in grant:
-            prockiller("DMRGateway")
-            bot.sendMessage(chat_id,"Beende DMRGateway...")
-        else:
-            bot.sendMessage(chat_id,grantfehler)
+    # elif msg['text'] in ["/killdmrgw"]:
+    #    if id in grant:
+    #        prockiller("DMRGateway")
+    #        bot.sendMessage(chat_id,"Beende DMRGateway...")
+    #    else:
+    #        bot.sendMessage(chat_id,grantfehler)
 
-    elif msg['text'] in ["/startdmrgw"]:
-        if id in grant:
-            os.system(dmrgwaufruf)
-            bot.sendMessage(chat_id,"Starte DMRGateway")
-        else:
-            bot.sendMessage(chat_id,grantfehler)
+    # elif msg['text'] in ["/startdmrgw"]:
+    #    if id in grant:
+    #        os.system(dmrgwaufruf)
+    #        bot.sendMessage(chat_id,"Starte DMRGateway")
+    #    else:
+    #        bot.sendMessage(chat_id,grantfehler)
 
     elif msg['text'] in ["/status"]:
 	status = ''
 	# Eingänge lesen
-        if GPIO.input(13) == GPIO.HIGH:
-	    status += "TX ist aus\n"
-        else:
-            status += "TX is an\n"
-        if GPIO.input(15) == GPIO.HIGH:
-            status += "RX ist aus"
-        else:
-            status += "RX ist an"
+    #    if GPIO.input(13) == GPIO.HIGH:
+	#    status += "TX ist aus\n"
+    #    else:
+    #        status += "TX is an\n"
+    #    if GPIO.input(15) == GPIO.HIGH:
+    #        status += "RX ist aus"
+    #    else:
+    #        status += "RX ist an"
 	# Laufende Prozesse testen
 	for proc in prozesse:
 	    status += "\n" + proc + " " + prozesschecker(proc)
@@ -187,31 +201,31 @@ def handle(msg):
 
         bot.sendMessage(chat_id, status)
 
-    elif msg['text'] in ["/txaus"]:
-        if id in grant:
-            GPIO.output(13, GPIO.HIGH)
-	    bot.sendMessage(chat_id,"Sender ist aus!")
-        else:
-	    bot.sendMessage(chat_id,grantfehler)
-    elif msg['text'] in ["/txan"]:
-        if id in grant:
-            GPIO.output(13, GPIO.LOW)
-            bot.sendMessage(chat_id,"Sender ist wieder an!")
-        else:
-            bot.sendMessage(chat_id,grantfehler)
+    #elif msg['text'] in ["/txaus"]:
+    #    if id in grant:
+    #        GPIO.output(13, GPIO.HIGH)
+	#    bot.sendMessage(chat_id,"Sender ist aus!")
+    #    else:
+	#    bot.sendMessage(chat_id,grantfehler)
+    #elif msg['text'] in ["/txan"]:
+    #    if id in grant:
+    #        GPIO.output(13, GPIO.LOW)
+    #        bot.sendMessage(chat_id,"Sender ist wieder an!")
+    #    else:
+    #        bot.sendMessage(chat_id,grantfehler)
 
-    elif msg['text'] in ["/rxaus"]:
-        if id in grant:
-            GPIO.output(15, GPIO.HIGH)
-            bot.sendMessage(chat_id,"Empfang ist aus!")
-        else:
-            bot.sendMessage(chat_id,grantfehler)
-    elif msg['text'] in ["/rxan"]:
-        if id in grant:
-            GPIO.output(15, GPIO.LOW)
-            bot.sendMessage(chat_id,"Empfang ist wieder an!")
-        else:
-            bot.sendMessage(chat_id,grantfehler)
+    #elif msg['text'] in ["/rxaus"]:
+    #    if id in grant:
+    #        GPIO.output(15, GPIO.HIGH)
+    #        bot.sendMessage(chat_id,"Empfang ist aus!")
+    #    else:
+    #        bot.sendMessage(chat_id,grantfehler)
+    #elif msg['text'] in ["/rxan"]:
+    #    if id in grant:
+    #        GPIO.output(15, GPIO.LOW)
+    #        bot.sendMessage(chat_id,"Empfang ist wieder an!")
+    #    else:
+    #        bot.sendMessage(chat_id,grantfehler)
 
     elif msg['text'] in ["/reboot"]:
 	if id in grant:
