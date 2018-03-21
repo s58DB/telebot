@@ -4,7 +4,7 @@
 apikey = ""
 
 # ACL für die Steuerung
-grant = []
+grant = [,]
 
 # ID des Botowner / der Botowner (die bekommen Nachrichten über Statusänderungen)
 owner = []
@@ -13,7 +13,9 @@ owner = []
 botcall = ""
 
 # Liste mit zu prüfenden Prozessen
-prozesse=[]
+prozesse=["","",""]
 
 # ID des Repeaters
 dmrid = ""
+# folder which contains mmdvm-logs
+mmdvmlogs = "/var/log/mmdvm"

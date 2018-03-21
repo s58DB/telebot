@@ -30,7 +30,13 @@ GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(13, GPIO.OUT)
 GPIO.setup(15, GPIO.OUT)
-GPIO.setup(4, GPIO.OUT)
+
+# define pathes to 1-wire sensor data
+sensors = [
+  ["/sys/bus/w1/devices/28-03b429126461/w1_slave","Zunanji senzor"],
+  ["/sys/bus/w1/devices/28-559d29126461/w1_slave","Senzor v ohišju"],
+]
+
 
 # Log
 def botlog(logtext):
@@ -38,6 +44,22 @@ def botlog(logtext):
     file.write(time.strftime("%d.%m. %H:%M:%S") + ": " + logtext + '\n')
     file.close()
 
+# function to read temp-sensors
+def read_sensor(path):
+  value = "U"
+  try:
+      f = open(path[0], "r")
+      line = f.readline()
+      if re.match(r"([0-9a-f]{2} ){9}: crc=[0-9a-f]{2} YES", line):
+          line = f.readline()
+          m = re.match(r"([0-9a-f]{2} ){9}t=([+-]?[0-9]+)", line)
+      if m:
+          value = str(float(m.group(2)) / 1000.0)
+      f.close()
+  except (IOError), e:
+    print time.strftime("%x %X"), "Error reading", path, ": ", e
+  return path[1] + ": " + value	
+	
 # Function Information about Botowner
 def ownerinfo(msg,owner):
     for x in owner:
