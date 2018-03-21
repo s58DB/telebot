@@ -1,6 +1,7 @@
 ﻿#!/usr/bin/python
 # -*- coding: utf-8 -*-
-import csv, requests, json, telepot, sys, os, time, datetime, psutil, RPi.GPIO as GPIO
+import re, csv, requests, json, telepot, sys, os, time, datetime, psutil, RPi.GPIO as GPIO
+from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 from telepot.loop import MessageLoop
 from pprint import pprint
 
@@ -11,6 +12,7 @@ from config import owner
 from config import botcall
 from config import prozesse
 from config import dmrid
+from config import mmdvmlogs
 
 logfile = "botlog.txt"
 userfile = "users.csv"
@@ -75,7 +77,7 @@ def lastheared(suchstring):
     else:
         suchstring = "received RF voice header from " +suchstring
     heared = []
-    dateiname = "/var/log/MMDVM/MMDVM-"+(time.strftime("%Y-%m-%d"))+".log"
+    dateiname = mmdvmlogs + "/mmdvm-"+(time.strftime("%Y-%m-%d"))+".log"
     file = open(dateiname, "r")
     for line in file:
         if line.find(suchstring) > 1:
@@ -91,17 +93,27 @@ def lastheared(suchstring):
 # Prozesskiller
 def prockiller(prozess):
     os.system('pkill '+prozess)
+	
+# Funktion Ausgabe Befehle
+def befehlsliste(id):
+    if id in grant:
+	return "\n" + befehlsliste_usr + befehlsliste_syop
+    else:
+	return "\n" + befehlsliste_usr
 
 # Funktion zum Abruf der Abbonierten TG
 def talkgroups():
     r = requests.get("http://api.brandmeister.network/v1.0/repeater/?action=profile&q=" + dmrid)
     try:
         data = r.json()
+        pprint(data)
         tgs = 'Talkgroups:'
         for tg in data['staticSubscriptions']:
             tgs += "\n" + str(tg['talkgroup']) + " im TS" + str(tg['slot'])
         for tg in data['clusters']:
             tgs += "\n" + str(tg['talkgroup']) + " im TS" + str(tg['slot']) + " (" + str(tg['extTalkgroup']) + ")"
+        for tg in data['timedSubscriptions']:
+	    tgs += "\n" + str(tg['talkgroup']) + " im TS" + str(tg['slot'])
         if tgs == 'Talkgroups:':
             tgs = "Ni nastavljenih staticnih TG"
     except:
@@ -162,28 +174,28 @@ def handle(msg):
 	    prockiller("MMDVMHost")
 	    bot.sendMessage(chat_id,"MMDVMHost ustavljen...")
         else:
-	    bot.sendMessage(chat_id,grantfehler)
+	    bot.sendMessage(chat_id,unauthorized)
 
     elif msg['text'] in ["/startmmdvm"]:
         if id in grant:
 	    os.system(mmdvmstart)
 	    bot.sendMessage(chat_id,"MMDVMHost ustavljen... ")
 	else:
-	    bot.sendMessage(chat_id,grantfehler)
+	    bot.sendMessage(chat_id,unauthorized)
 		
 		elif msg['text'] in ["/killircddbgw"]:
 	if id in grant:
 	    prockiller("ircddbgateway")
 	    bot.sendMessage(chat_id,"ircDDBGateway ustavljen...")
         else:
-	    bot.sendMessage(chat_id,grantfehler)
+	    bot.sendMessage(chat_id,unauthorized)
 
     elif msg['text'] in ["/startircddbgw"]:
         if id in grant:
 	    os.system(ircddbgwstart)
 	    bot.sendMessage(chat_id,"ircDDBGateway zagnan...")
 	else:
-	    bot.sendMessage(chat_id,grantfehler)
+	    bot.sendMessage(chat_id,unauthorized)
 
     # elif msg['text'] in ["/killdmrgw"]:
     #    if id in grant:
@@ -222,6 +234,15 @@ def handle(msg):
 	status += "\nCPU Temperatur " + str(tempC)
 
         bot.sendMessage(chat_id, status)
+	
+	# read the sensors
+	i = 0
+	for row in sensors:
+    	    status += '\n'
+    	    status += read_sensor(sensors[i])
+    	    i = i + 1
+
+        bot.sendMessage(chat_id, status)
 
     #elif msg['text'] in ["/txaus"]:
     #    if id in grant:
@@ -251,26 +272,26 @@ def handle(msg):
 
     elif msg['text'] in ["/reboot"]:
 	if id in grant:
-	    bot.sendMessage(chat_id,"Starte das System neu.")
-	    os.system('sudo shutdown -r now')
+	    bot.sendMessage(chat_id,"Ponovni zagon sistema")
+	    os.system('sudo reboot')
 	else:
-            bot.sendMessage(chat_id,grantfehler)
+            bot.sendMessage(chat_id,unauthorized)
     else:
-	bot.sendMessage(chat_id, 'Mit "' + msg['text'] + '" kann ich nichts anfangen, '+ name + "!\nEine Liste der Befehle bekommst du mit /hilfe.")
+	bot.sendMessage(chat_id, 'Z "' + msg['text'] + '" ne morem storiti ničesar, '+ name + "!\nza seznam ukazov vnesi /pomoc.")
 
 bot = telepot.Bot(apikey)
 
 try:
-    ownerinfo("Ich bin wieder da...",owner)
+    ownerinfo("Vrnil sem se...",owner)
     MessageLoop(bot,handle).run_as_thread()
 except:
-    print("Irgendwas stimmt mit dem Bot nicht....")
+    print("Nekaj je narobe z Botom...")
 
 try:
     while 1:
         time.sleep(10)
 
 except:
-    print("Tschüss....")
-    ownerinfo("Der Bot wird beendet...",owner)
+    print("Nasvidenje...")
+    ownerinfo("Bot se je ustavil...",owner)
     # GPIO.cleanup()
