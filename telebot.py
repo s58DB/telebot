@@ -23,6 +23,7 @@ mmdvmstart = "sudo systemctl start mmdvmhost.service"
 mmdvmrestart = "sudo systemctl restart mmdvmhost.service"
 ircddbgwstart = "sudo systemctl start ircddbgateway.service"
 ircddbgwrestart = "sudo systemctl restart ircddbgateway.service"
+ircddbgwstop = "sudo systemctl stop ircddbgateway.service"
 ysfgwstart = "sudo /etc/init.d/YSFGateway.sh start"
 ysfgwrestart = "sudo /etc/init.d/YSFGateway.sh restart"
 #dmrgwaufruf = "/usr/bin/screen /home/pi/DMRGateway/DMRGateway /home/pi/DMRGateway/DMRGateway-DB0ASE.ini"
@@ -147,11 +148,12 @@ def handle(msg):
 	bot.sendMessage(chat_id, "Dobrodosel v " + botcall + " " + vorname + "!" + \
 				 "\nCe potrebujes pomoc vpisi /pomoc . Za dodatne informacije, predloge in pripombe sem dosegljiv na Telegramu: @s58db ali na email: s58db.danilo@gmail.com.")
 				 
-    elif msg['text'] in ["/pomoc", "pomoc","help","hilfe"]:
-	hilfetext = "Informacije in ukazi:\n/status Informacija o stanju repetitorja \n/hilfe Prikaze " \
-                    " listo ukazov\n/tg Izpiše seznam staticnih TG na repetitorju \n/lheared Izpiše zadnjo postajo ki je oddajala"
+    elif msg['text'] in ["/pomoc", "pomoc","help","hilfe", "sos", "ayday"]:
+	hilfetext = "Informacije in ukazi:\n/status Informacija o stanju repetitorja \n/pomoc Prikaze" \
+                    " izvrsljive ukazov\n/tg Izpiše seznam staticnih TG na repetitorju \n/lheared Izpiše zadnjo postajo ki je oddajala"
         if id in grant:
-            hilfetext += "\n\n/killmmdvm zaustavi MMDVMHost\n/startmmdvm zazeni MMDVMHost\n/killircddbgw zaustavitev ircDDBGateway\n/startircddbgw zagon ircDDBGateway" \
+            hilfetext += "\n\n/killmmdvm zaustavi MMDVMHost\n/startmmdvm zazeni MMDVMHost\n/restartmmdvm Znova zazeni MMDVMHost" \
+			"\n/killircddbgw zaustavitev ircDDBGateway\n/startircddbgw zagon ircDDBGateway\n/restartircddbgw Znova zaženi ircDDBGateway" \
 			"\n/killysfgw zaustavi YSFGateway\n/startysfgw zazeni YSFGateway\n/reboot Ponovni zagon sistema" \
 			# "\n/txan Schaltet den Sender an\n/txaus Schaltet den Sender aus\n/rxan Schaltet den RX ein" \
 			# "\n/rxaus Schaltet den RX an\n/reboot start den Rechner neu"
@@ -172,28 +174,42 @@ def handle(msg):
     elif msg['text'] in ["/killmmdvm"]:
 	if id in grant:
 	    prockiller("MMDVMHost")
-	    bot.sendMessage(chat_id,"MMDVMHost ustavljen...")
+	    bot.sendMessage(chat_id,"MMDVMHost se je zaustavil...")
         else:
 	    bot.sendMessage(chat_id,unauthorized)
-
-    elif msg['text'] in ["/startmmdvm"]:
+		
+	elif msg['text'] in ["/startmmdvm"]:
         if id in grant:
 	    os.system(mmdvmstart)
-	    bot.sendMessage(chat_id,"MMDVMHost ustavljen... ")
+	    bot.sendMessage(chat_id,"MMDVMHost se je zagnal... ")
+	else:
+	    bot.sendMessage(chat_id,unauthorized)
+	
+	elif msg['text'] in ["/restartmmdvm"]:
+        if id in grant:
+	    os.system(mmdvmrestart)
+	    bot.sendMessage(chat_id,"MMDVMHost se je ponovno zagnal... ")
 	else:
 	    bot.sendMessage(chat_id,unauthorized)
 		
 	elif msg['text'] in ["/killircddbgw"]:
-		if id in grant:
-	    prockiller("ircddbgateway")
-	    bot.sendMessage(chat_id,"ircDDBGateway ustavljen...")
-        else:
+        if id in grant:
+	    os.system(ircddbgwstop)
+	    bot.sendMessage(chat_id,"ircDDBGateway se je zaustavil...")
+	else:
 	    bot.sendMessage(chat_id,unauthorized)
 
     elif msg['text'] in ["/startircddbgw"]:
         if id in grant:
 	    os.system(ircddbgwstart)
-	    bot.sendMessage(chat_id,"ircDDBGateway zagnan...")
+	    bot.sendMessage(chat_id,"ircDDBGateway se je zagnal...")
+	else:
+	    bot.sendMessage(chat_id,unauthorized)
+		
+	elif msg['text'] in ["/restartircddbgw"]:
+        if id in grant:
+	    os.system(ircddbgwrestart)
+	    bot.sendMessage(chat_id,"ircDDBGateway se je ponovno zagnal...")
 	else:
 	    bot.sendMessage(chat_id,unauthorized)
 
