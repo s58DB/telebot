@@ -77,7 +77,7 @@ def lastheared(suchstring):
     else:
         suchstring = "received RF voice header from " +suchstring
     heared = []
-    dateiname = mmdvmlogs + "/mmdvm-"+(time.strftime("%Y-%m-%d"))+".log"
+    dateiname = mmdvmlogs + "-"+(time.strftime("%Y-%m-%d"))+".log"
     file = open(dateiname, "r")
     for line in file:
         if line.find(suchstring) > 1:
@@ -152,7 +152,7 @@ def handle(msg):
                     " listo ukazov\n/tg Izpiše seznam staticnih TG na repetitorju \n/lheared Izpiše zadnjo postajo ki je oddajala"
         if id in grant:
             hilfetext += "\n\n/killmmdvm zaustavi MMDVMHost\n/startmmdvm zazeni MMDVMHost\n/killircddbgw zaustavitev ircDDBGateway\n/startircddbgw zagon ircDDBGateway" \
-			"\n/killysfgw zaustavi YSFGateway\n/startysfgw zazeni YSFGateway" \
+			"\n/killysfgw zaustavi YSFGateway\n/startysfgw zazeni YSFGateway\n/reboot Ponovni zagon sistema" \
 			# "\n/txan Schaltet den Sender an\n/txaus Schaltet den Sender aus\n/rxan Schaltet den RX ein" \
 			# "\n/rxaus Schaltet den RX an\n/reboot start den Rechner neu"
         bot.sendMessage(chat_id,botcall + " " + hilfetext)
@@ -183,8 +183,8 @@ def handle(msg):
 	else:
 	    bot.sendMessage(chat_id,unauthorized)
 		
-		elif msg['text'] in ["/killircddbgw"]:
-	if id in grant:
+	elif msg['text'] in ["/killircddbgw"]:
+		if id in grant:
 	    prockiller("ircddbgateway")
 	    bot.sendMessage(chat_id,"ircDDBGateway ustavljen...")
         else:
