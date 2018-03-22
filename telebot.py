@@ -198,7 +198,6 @@ def handle(msg):
 	    bot.sendMessage(chat_id,"ircDDBGateway se je zaustavil...")
 	else:
             bot.sendMessage(chat_id,unauthorized)
-            
 
     elif msg['text'] in ["/startircddbgw"]:
         if id in grant:
@@ -214,21 +213,19 @@ def handle(msg):
         else:
             bot.sendMessage(chat_id,grantfehler)
 
-	elif msg['text'] in ["/killysfgw"]:
-		if id in grant:
-			prockiller("YSFGateway")
-			bot.sendMessage(chat_id,"YSFGateway se je zaustavil...")
+    elif msg['text'] in ["/killysfgw"]:
+        if id in grant:
+            prockiller("YSFGateway")
+            bot.sendMessage(chat_id,"YSFGateway se je zaustavil...")
         else:
-	    bot.sendMessage(chat_id,unauthorized)
-
-	elif msg['text'] in ["/startysfgw"]:
+            bot.sendMessage(chat_id,unauthorized)
+    elif msg['text'] in ["/startysfgw"]:
         if id in grant:
             os.system(ysfgwstart)
             bot.sendMessage(chat_id,"YSFGateway se je zagnal...")
         else:
             bot.sendMessage(chat_id,grantfehler)
-				
-	elif msg['text'] in ["/restartysfgw"]:
+    elif msg['text'] in ["/restartysfgw"]:
         if id in grant:
             os.system(ysfgwrestart)
             bot.sendMessage(chat_id,"YSFGateway se je ponovno zagnal...")
