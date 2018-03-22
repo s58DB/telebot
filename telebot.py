@@ -144,16 +144,16 @@ def handle(msg):
     # print(msg['text'])
 
     if msg['text'] in ["/start","/start start", "start", "hallo", "Hallo", "Hi", "Start", "Zdravo", "Zivijo", "zdravo", "zivijo"]:
-	bot.sendMessage(chat_id, "Dobrodosel v " + botcall + " " + vorname + "!" + \
-				 "\nCe potrebujes pomoc vpisi /pomoc . Za dodatne informacije, predloge in pripombe sem dosegljiv na Telegramu: @s58db ali na email: s58db.danilo@gmail.com.")
+	bot.sendMessage(chat_id, "Dobrodošel v " + botcall + ", " + vorname + "!" + \
+				 "\nCe potrebujes pomoč vpisi /pomoc . Za dodatne informacije, predloge in pripombe sem dosegljiv na Telegramu: @s58db ali na email: s58db.danilo@gmail.com.")
 				 
     elif msg['text'] in ["/pomoc", "pomoc","help","hilfe", "sos", "ayday"]:
 	hilfetext = "Informacije in ukazi:\n/status Informacija o stanju repetitorja \n/pomoc Prikaze" \
                     " izvrsljive ukazov\n/tg Izpiše seznam staticnih TG na repetitorju \n/lheared Izpiše zadnjo postajo ki je oddajala"
         if id in grant:
-            hilfetext += "\n\n/killmmdvm zaustavi MMDVMHost\n/startmmdvm zazeni MMDVMHost\n/restartmmdvm Znova zazeni MMDVMHost" \
-			"\n/killircddbgw zaustavitev ircDDBGateway\n/startircddbgw zagon ircDDBGateway\n/restartircddbgw Znova zaženi ircDDBGateway" \
-			"\n/killysfgw zaustavi YSFGateway\n/startysfgw zazeni YSFGateway\n/reboot Ponovni zagon sistema" \
+            hilfetext += "\n\n/killmmdvm zaustavi MMDVMHost\n/startmmdvm zaženi MMDVMHost\n/restartmmdvm Znova zaženi MMDVMHost" \
+			"\n/killircddbgw zaustavitev ircDDBGateway\n/startircddbgw zaženi ircDDBGateway\n/restartircddbgw Znova zaženi ircDDBGateway" \
+			"\n/killysfgw zaustavitev YSFGateway\n/startysfgw zaženi YSFGateway\n/restartysfgw zaženi YSFGateway\n/reboot Ponovni zagon sistema" \
 			# "\n/txan Schaltet den Sender an\n/txaus Schaltet den Sender aus\n/rxan Schaltet den RX ein" \
 			# "\n/rxaus Schaltet den RX an\n/reboot start den Rechner neu"
         bot.sendMessage(chat_id,botcall + " " + hilfetext)
@@ -214,6 +214,26 @@ def handle(msg):
         else:
             bot.sendMessage(chat_id,grantfehler)
 
+	elif msg['text'] in ["/killysfgw"]:
+		if id in grant:
+			prockiller("YSFGateway")
+			bot.sendMessage(chat_id,"YSFGateway se je zaustavil...")
+        else:
+	    bot.sendMessage(chat_id,unauthorized)
+
+	elif msg['text'] in ["/startysfgw"]:
+        if id in grant:
+            os.system(ysfgwstart)
+            bot.sendMessage(chat_id,"YSFGateway se je zagnal...")
+        else:
+            bot.sendMessage(chat_id,grantfehler)
+				
+	elif msg['text'] in ["/restartysfgw"]:
+        if id in grant:
+            os.system(ysfgwrestart)
+            bot.sendMessage(chat_id,"YSFGateway se je ponovno zagnal...")
+        else:
+            bot.sendMessage(chat_id,grantfehler)
 
     # elif msg['text'] in ["/killdmrgw"]:
     #    if id in grant:
