@@ -184,14 +184,13 @@ def handle(msg):
         else:
             bot.sendMessage(chat_id,unauthorized)
 
-
     elif msg['text'] in ["/restartmmdvm"]:
         if id in grant:
             os.system(mmdvmrestart)
             bot.sendMessage(chat_id,"MMDVMHost se je ponovno zagnal... ")
         else:
             bot.sendMessage(chat_id,grantfehler)
-            
+            
     elif msg['text'] in ["/killircddbgw"]:
         if id in grant:
 	    os.system(ircddbgwstop)
