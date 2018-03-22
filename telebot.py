@@ -1,4 +1,4 @@
-﻿#!/usr/bin/python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 import re, csv, requests, json, telepot, sys, os, time, datetime, psutil, RPi.GPIO as GPIO
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
@@ -36,8 +36,7 @@ GPIO.setup(15, GPIO.OUT)
 
 # define pathes to 1-wire sensor data
 sensors = [
-  ["/sys/bus/w1/devices/28-03b429126461/w1_slave","Zunanji senzor"],
-  ["/sys/bus/w1/devices/28-559d29126461/w1_slave","Senzor v ohišju"],
+  ["/sys/bus/w1/devices/28-0317237f89ff/w1_slave","Senzor v ohišju"]
 ]
 
 
@@ -61,8 +60,8 @@ def read_sensor(path):
       f.close()
   except (IOError), e:
     print time.strftime("%x %X"), "Error reading", path, ": ", e
-  return path[1] + ": " + value	
-	
+  return path[1] + ": " + value
+
 # Function Information about Botowner
 def ownerinfo(msg,owner):
     for x in owner:
@@ -74,9 +73,9 @@ def ownerinfo(msg,owner):
 # Lasthearedfunktion
 def lastheared(suchstring):
     if suchstring == '':
-	suchstring =  "received network voice header from"
+       suchstring =  "received network voice header from"
     else:
-        suchstring = "received RF voice header from " +suchstring
+       suchstring = "received RF voice header from " +suchstring
     heared = []
     dateiname = mmdvmlogs + "-"+(time.strftime("%Y-%m-%d"))+".log"
     file = open(dateiname, "r")
@@ -177,41 +176,44 @@ def handle(msg):
 	    bot.sendMessage(chat_id,"MMDVMHost se je zaustavil...")
         else:
 	    bot.sendMessage(chat_id,unauthorized)
-		
-	elif msg['text'] in ["/startmmdvm"]:
+
+    elif msg['text'] in ["/startmmdvm"]:
         if id in grant:
-	    os.system(mmdvmstart)
-	    bot.sendMessage(chat_id,"MMDVMHost se je zagnal... ")
-	else:
-	    bot.sendMessage(chat_id,unauthorized)
-	
-	elif msg['text'] in ["/restartmmdvm"]:
+            os.system(mmdvmstart)
+            bot.sendMessage(chat_id,"MMDVMHost ustavljen... ")
+        else:
+            bot.sendMessage(chat_id,unauthorized)
+
+
+    elif msg['text'] in ["/restartmmdvm"]:
         if id in grant:
-	    os.system(mmdvmrestart)
-	    bot.sendMessage(chat_id,"MMDVMHost se je ponovno zagnal... ")
-	else:
-	    bot.sendMessage(chat_id,unauthorized)
-		
-	elif msg['text'] in ["/killircddbgw"]:
+            os.system(mmdvmrestart)
+            bot.sendMessage(chat_id,"MMDVMHost se je ponovno zagnal... ")
+        else:
+            bot.sendMessage(chat_id,grantfehler)
+            
+    elif msg['text'] in ["/killircddbgw"]:
         if id in grant:
 	    os.system(ircddbgwstop)
 	    bot.sendMessage(chat_id,"ircDDBGateway se je zaustavil...")
 	else:
-	    bot.sendMessage(chat_id,unauthorized)
+            bot.sendMessage(chat_id,unauthorized)
+            
 
     elif msg['text'] in ["/startircddbgw"]:
         if id in grant:
-	    os.system(ircddbgwstart)
-	    bot.sendMessage(chat_id,"ircDDBGateway se je zagnal...")
-	else:
-	    bot.sendMessage(chat_id,unauthorized)
-		
-	elif msg['text'] in ["/restartircddbgw"]:
+            os.system(ircddbgwstart)
+            bot.sendMessage(chat_id,"rcDDBGateway se je zagnal...")
+        else:
+            bot.sendMessage(chat_id,grantfehler)
+
+    elif msg['text'] in ["/restartircddbgw"]:
         if id in grant:
-	    os.system(ircddbgwrestart)
-	    bot.sendMessage(chat_id,"ircDDBGateway se je ponovno zagnal...")
-	else:
-	    bot.sendMessage(chat_id,unauthorized)
+            os.system(ircddbgwrestart)
+            bot.sendMessage(chat_id,"ircDDBGateway se je ponovno zagnal...")
+        else:
+            bot.sendMessage(chat_id,grantfehler)
+
 
     # elif msg['text'] in ["/killdmrgw"]:
     #    if id in grant:
