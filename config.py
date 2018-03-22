@@ -17,5 +17,6 @@ prozesse=["","",""]
 
 # ID des Repeaters
 dmrid = ""
+
 # folder which contains mmdvm-logs
 mmdvmlogs = "/var/log/MMDVM/MMDVM"
