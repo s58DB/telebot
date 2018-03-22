@@ -135,8 +135,8 @@ def handle(msg):
     #print(content_type, chat_type, chat_id)
     #pprint(msg)
 
-    #vorname = msg['from']['first_name']
-	name = msg['from']['first_name']
+    vorname = msg['from']['first_name']
+	#name = msg['from']['first_name']
     username = msg['from']['username']
     id = msg['from']['id']
     msg['text'] = msg['text'].lower()
@@ -144,7 +144,7 @@ def handle(msg):
     # print(msg['text'])
 
     if msg['text'] in ["/start","/start start", "start", "hallo", "Hallo", "Hi", "Start", "Zdravo", "Zivijo", "zdravo", "zivijo"]:
-	bot.sendMessage(chat_id, "Dobrodosel v " + botcall + " " + name + "!" + \
+	bot.sendMessage(chat_id, "Dobrodosel v " + botcall + " " + vorname + "!" + \
 				 "\nCe potrebujes pomoc vpisi /pomoc . Za dodatne informacije, predloge in pripombe sem dosegljiv na Telegramu: @s58db ali na email: s58db.danilo@gmail.com.")
 				 
     elif msg['text'] in ["/pomoc", "pomoc","help","hilfe"]:
@@ -277,7 +277,7 @@ def handle(msg):
 	else:
             bot.sendMessage(chat_id,unauthorized)
     else:
-	bot.sendMessage(chat_id, 'Z "' + msg['text'] + '" ne morem storiti ničesar, '+ name + "!\nza seznam ukazov vnesi /pomoc.")
+	bot.sendMessage(chat_id, 'Z "' + msg['text'] + '" ne morem storiti ničesar, '+ vorname + "!\nza seznam ukazov vnesi /pomoc.")
 
 bot = telepot.Bot(apikey)
 
